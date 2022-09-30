@@ -16,6 +16,8 @@ public class UserDb {
     private TreeMap<String,UserModel> phoneNumbers = new TreeMap<>();
     private UserDb(){
         activationCodeDb = ActivationCodeDb.getInstance();
+        tokenDb = TokenDb.getInstance();
+
         users.put(0,new UserModel(0,"mina","ghorbani","minampa","123456", "09226329170", false));
         users.put(1,new UserModel(1,"mohsen","ghorbani","mohsern","654321", "09398800190", true));
         usernames.put("mohsern",users.get(1));
@@ -37,7 +39,7 @@ public class UserDb {
         return users.get(phoneNumber);
     }
     public UserModel findUserByUsername(String username){
-        return users.get(username);
+        return usernames.get(username);
     }
     public List<UserModel> getUsers(){
         return users.values().stream().toList();
@@ -136,7 +138,7 @@ public class UserDb {
 
     public UserModel getMyInfo(int id, String token) {
         String t = tokenDb.tokens.get(id);
-        if (t.equals(token))
+        if (t!=null && t.equals(token))
             return users.get(id);
         return null;
     }

@@ -1,7 +1,9 @@
 package org.example;
 
 
+import org.apache.el.parser.Token;
 import org.example.database.ActivationCodeDb;
+import org.example.database.TokenDb;
 import org.example.database.UserDb;
 import org.example.model.UserModel;
 import org.springframework.web.bind.annotation.*;
@@ -15,11 +17,11 @@ public class Controller {
 
     UserDb userDb;
     ActivationCodeDb activationCodeDb;
-
+    TokenDb tokenDb;
     public Controller(){
         userDb = UserDb.getInstance();
         activationCodeDb = ActivationCodeDb.getInstance();
-
+        tokenDb = TokenDb.getInstance();
     }
 
     @GetMapping(path = "/userById")
@@ -90,11 +92,14 @@ public class Controller {
     }
 
     @GetMapping(path = "/myInfo")
-    public UserModel getMyInfo(int id, String token){
+    public UserModel getMyInfo(Integer id, String token){
+        if (id==null || token==null) return null;
         return userDb.getMyInfo(id, token);
     }
 
-//    @PutMapping(path = "/update")
-
+    @GetMapping(path = "/getTokens")
+    public TreeMap<Integer, String> getTokens(){
+        return tokenDb.tokens;
+    }
 }
 

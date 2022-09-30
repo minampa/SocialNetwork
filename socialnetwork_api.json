@@ -19,7 +19,7 @@
 				],
 				"body": {
 					"mode": "raw",
-					"raw": "{\n\t\"firstName\" : \"mina\", \n\t\"lastName\" : \"ghorbani\",\n\t\"phoneNumber\" : \"09226329170\",\n\t\"username\" : \"minampa\"\n\t\n}"
+					"raw": "{\n\t\"firstName\" : \"farhad\", \n\t\"lastName\" : \"ghorbani\",\n\t\"username\" : \"farhad0ix\",\n\t\"password\" : \"123456\",\n\t\"phoneNumber\" : \"09121414141\"\n\n}"
 				},
 				"url": {
 					"raw": "localhost:8080/register",
@@ -58,13 +58,19 @@
 				"method": "GET",
 				"header": [],
 				"url": {
-					"raw": "localhost:8080/activationCode",
+					"raw": "localhost:8080/activationCode?id=3",
 					"host": [
 						"localhost"
 					],
 					"port": "8080",
 					"path": [
 						"activationCode"
+					],
+					"query": [
+						{
+							"key": "id",
+							"value": "3"
+						}
 					]
 				}
 			},
@@ -80,12 +86,12 @@
 					"formdata": [
 						{
 							"key": "id",
-							"value": "0",
+							"value": "3\n",
 							"type": "text"
 						},
 						{
 							"key": "activationCode",
-							"value": "175751",
+							"value": "733628",
 							"type": "text"
 						}
 					]
@@ -119,28 +125,22 @@
 					}
 				],
 				"body": {
-					"mode": "urlencoded",
-					"urlencoded": [
-						{
-							"key": "0\n",
-							"value": "",
-							"type": "text"
-						}
-					]
+					"mode": "raw",
+					"raw": ""
 				},
 				"url": {
-					"raw": "localhost:8080/userById?0",
+					"raw": "localhost:8080/userByUsername?username=minampa",
 					"host": [
 						"localhost"
 					],
 					"port": "8080",
 					"path": [
-						"userById"
+						"userByUsername"
 					],
 					"query": [
 						{
-							"key": "0",
-							"value": null
+							"key": "username",
+							"value": "minampa"
 						}
 					]
 				}
@@ -160,8 +160,8 @@
 					}
 				],
 				"body": {
-					"mode": "formdata",
-					"formdata": []
+					"mode": "raw",
+					"raw": "{\n        \"id\": 1,\n        \"firstName\": \"mehrdad\",\n        \"lastName\": \"ghorbani\",\n        \"username\": \"mehrdadmif\",\n        \"password\": \"123456\",\n        \"phoneNumber\": \"09121212121\"\n    }"
 				},
 				"url": {
 					"raw": "localhost:8080/update",
@@ -178,6 +178,117 @@
 							"value": ""
 						}
 					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "login",
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"name": "Content-Type",
+						"value": "application/json",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": ""
+				},
+				"url": {
+					"raw": "localhost:8080/login?username=minampa&password=123456",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"login"
+					],
+					"query": [
+						{
+							"key": "username",
+							"value": "minampa"
+						},
+						{
+							"key": "password",
+							"value": "123456"
+						},
+						{
+							"key": "",
+							"value": ""
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "logout",
+			"request": {
+				"method": "DELETE",
+				"header": [
+					{
+						"key": "Content-Type",
+						"name": "Content-Type",
+						"value": "application/json",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": ""
+				},
+				"url": {
+					"raw": "localhost:8080/logout?id=0&token=H43jjwWi7q",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"logout"
+					],
+					"query": [
+						{
+							"key": "id",
+							"value": "0"
+						},
+						{
+							"key": "token",
+							"value": "H43jjwWi7q"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "getTokens",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "localhost:8080/getTokens",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"getTokens"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "getMyInfo",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": ""
 				}
 			},
 			"response": []
