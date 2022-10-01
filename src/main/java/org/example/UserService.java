@@ -1,40 +1,43 @@
 package org.example;
 
-import org.example.database.ActivationCodeDb;
-import org.example.database.TokenDb;
-import org.example.database.UserDb;
-import org.example.model.UserModel;
 
+import org.example.model.ActivationModel;
+import org.example.model.TokenModel;
+import org.example.model.UserModel;
+import org.example.repository.ActivationCodeRepository;
+import org.example.repository.TokenRepository;
+import org.example.repository.UserRepository;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
+import javax.transaction.Transactional;
 import java.util.List;
 import java.util.Random;
 
+@Component
 public class UserService{
-
     int counter = 2;
-    public UserDb userDb = null;
-    public TokenDb tokenDb;
-    public UserService(){
-        userDb = UserDb.getInstance();
-        activationCodeDb = ActivationCodeDb.getInstance();
-        tokenDb = TokenDb.getInstance();
-    }
-    public ActivationCodeDb activationCodeDb;
+    @Autowired
+    public UserRepository userRepository ;
+    @Autowired
+    public TokenRepository tokenRepository;
+    @Autowired
+    public ActivationCodeRepository activationCodeRepository;
     public UserModel findUserById(int id){
-        return userDb.findUserById(id);
+        return userRepository.findUserModelById(id);
     }
     public UserModel findUserByUsername(String username){
-        return userDb.findUserByUsername(username);
+        return userRepository.findUserModelByUsername(username);
     }
     public UserModel findUserByPhoneNumber(String phoneNumber){
-        return userDb.findUserByPhoneNumber(phoneNumber);
+        return userRepository.findUserModelByPhoneNumber(phoneNumber);
     }
     public List<UserModel> getUsers(){
-        return userDb.getUsersById();
+        return userRepository.findAll();
     }
     public UserModel registerUser(UserModel user){
-        if (userDb.findUserByUsername(user.username) != null)
+        if (userRepository.findUserModelByUsername(user.username) != null)
             return null;
-        if (userDb.findUserByPhoneNumber(user.phoneNumber) != null)
+        if (userRepository.findUserModelByPhoneNumber(user.phoneNumber) != null)
             return null;
 //        if (usernames.get(user.username)!=null)
 //            return null;
@@ -43,11 +46,11 @@ public class UserService{
         String activationCode = generateActivationCode();
         user.isActive = false;
         user.id = counter;
-        activationCodeDb.insertActivationCode(user.id, activationCode);
+        activationCodeRepository.save(new ActivationModel(user.id,activationCode));
 //        activationCodeDb.activationCodes.put(user.id, activationCode);
         sendCodeToUser(user.id,activationCode);
         //todo check, username,
-        userDb.insertUsers(user);
+        userRepository.save(user);
 //        users.put(counter,user);
 //        usernames.put(user.username, user);
 //        phoneNumbers.put(user.phoneNumber, user);
@@ -92,12 +95,12 @@ public class UserService{
     }
 
     public UserModel updateUser(UserModel newUser){
-        UserModel oldUser = userDb.findUserById(newUser.id);
-        UserModel updatedUser = userDb.updateUser(newUser);
+        UserModel oldUser = userRepository.findUserModelById(newUser.id);
+        UserModel updatedUser = userRepository.save(newUser);
         if (!updatedUser.phoneNumber.equals(oldUser.phoneNumber)){
             String activationCode = generateActivationCode();
-            activationCodeDb.activationCodes.remove(newUser.id, activationCode);
-            activationCodeDb.activationCodes.put(newUser.id, activationCode);
+            activationCodeRepository.deleteByUserId(newUser.id);
+            activationCodeRepository.save(new ActivationModel(newUser.id, activationCode));
             sendCodeToUser(newUser.id, activationCode);
         }
         return updatedUser;
@@ -107,21 +110,22 @@ public class UserService{
         UserModel user = findUserByUsername(username);
         if (user != null && user.isActive && password.equals(user.password)){
             String token = createToken();
-            tokenDb.insertToken(user.id, token);
+            tokenRepository.save(new TokenModel(token, user.id));
             return token;
         }
         return "";
     }
+    @Transactional
     public void logout(int id, String token){
-        String t = tokenDb.tokens.get(id);
-        if( t.equals(token))
-            tokenDb.deleteToken(id);
+        TokenModel t = tokenRepository.findByUserId(id);
+        if( t.token.equals(token))
+            tokenRepository.deleteByUserId(id);
     }
 
     public UserModel getMyInfo(int id, String token) {
-        String t = tokenDb.tokens.get(id);
-        if (t!=null && t.equals(token))
-            return userDb.findUserById(id);
+        TokenModel t = tokenRepository.findByUserId(id);
+        if (t!=null && t.token.equals(token))
+            return userRepository.findUserModelById(id);
         return null;
     }
 

@@ -1,7 +1,10 @@
 package org.example.database;
 
+import org.springframework.stereotype.Component;
+
 import java.util.TreeMap;
 
+@Component
 public class ActivationCodeDb {
 
     public TreeMap<Integer, String> activationCodes = new TreeMap<>();

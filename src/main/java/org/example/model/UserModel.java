@@ -1,15 +1,22 @@
 package org.example.model;
 
-public class UserModel extends ResponseModel {
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.Id;
 
+@Entity(name = "UserModel")
+public class UserModel extends ResponseModel {
+    @Id
     public int id;
 
     public String firstName;
 
     public String lastName;
+    @Column(unique = true)
 
     public String username;
     public String password;
+    @Column(unique = true)
 
     public String phoneNumber;
 

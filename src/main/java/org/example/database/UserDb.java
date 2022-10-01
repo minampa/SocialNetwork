@@ -1,10 +1,12 @@
 package org.example.database;
 
 import org.example.model.UserModel;
+import org.springframework.stereotype.Component;
 
 import java.util.List;
 import java.util.TreeMap;
 
+@Component
 public class UserDb {
     private static UserDb instance = null;
     int counter = 0 ;

@@ -4,9 +4,14 @@ package org.example;
 import org.example.database.ActivationCodeDb;
 import org.example.database.TokenDb;
 import org.example.database.UserDb;
+import org.example.model.ActivationModel;
+import org.example.model.TokenModel;
 import org.example.model.UserModel;
+import org.example.repository.UserRepository;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
+import javax.transaction.Transactional;
 import java.util.List;
 import java.util.TreeMap;
 
@@ -14,26 +19,20 @@ import java.util.TreeMap;
 @RestController
 public class Controller {
 
-    UserDb userDb;
-    ActivationCodeDb activationCodeDb;
-    TokenDb tokenDb;
+
+    @Autowired
     UserService userService;
-    public Controller(){
-        userDb = UserDb.getInstance();
-        activationCodeDb = ActivationCodeDb.getInstance();
-        tokenDb = TokenDb.getInstance();
-        userService = new UserService();
-    }
 
     @GetMapping(path = "/userById")
     public UserModel findUserByID(@RequestParam int id) {
-        return userDb.findUserById(id);
+        return userService.findUserById(id);
     }
 
     @GetMapping(path = "/userByUsername")
     public UserModel findUserByUsername(@RequestParam String username){
-        return userDb.findUserByUsername(username);
+        return userService.findUserByUsername(username);
     }
+
 
     @RequestMapping(method = RequestMethod.POST, path = "/register", consumes = "application/json")
     public UserModel registerUser(@RequestBody UserModel user){
@@ -59,18 +58,19 @@ public class Controller {
     }
 
     @GetMapping(path = "/activationCode")
-    public TreeMap<Integer,String> getActivationCodes(){
-        return activationCodeDb.activationCodes;
+    public List<ActivationModel> getActivationCodes(){
+        return userService.activationCodeRepository.findAll();
     }
 
+    @Transactional
     @PostMapping(path = "/activate")
     public String activate(@RequestParam int id,@RequestParam String activationCode){
-        UserModel user = userDb.findUserById(id);
+        UserModel user = userService.findUserById(id);
         if (user == null) return "user not found";
-        String activationCodeInServer = activationCodeDb.activationCodes.get(id);
-        if (activationCode.equals(activationCodeInServer)) {
+        ActivationModel activationCodeInServer = userService.activationCodeRepository.findActivationCodeByUserId(id);
+        if (activationCode.equals(activationCodeInServer.activationCode)) {
             user.isActive = true;
-            activationCodeDb.activationCodes.remove(id);
+            userService.activationCodeRepository.deleteByUserId(id);
             return "activated successfully.";
         }else return "your code is wrong.";
         //we should save the user but user is in memory ram, we don't need to save it.
@@ -99,8 +99,8 @@ public class Controller {
     }
 
     @GetMapping(path = "/getTokens")
-    public TreeMap<Integer, String> getTokens(){
-        return tokenDb.tokens;
+    public List<TokenModel> getTokens(){
+        return userService.tokenRepository.findAll();
     }
 }
 

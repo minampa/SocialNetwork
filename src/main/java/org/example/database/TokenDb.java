@@ -1,6 +1,11 @@
 package org.example.database;
 
+import org.springframework.context.annotation.Scope;
+import org.springframework.stereotype.Component;
+
 import java.util.TreeMap;
+
+@Component
 
 public class TokenDb {
     public TreeMap<Integer,String> tokens = new TreeMap<>();
