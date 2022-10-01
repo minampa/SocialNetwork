@@ -18,10 +18,12 @@ public class Controller {
     UserDb userDb;
     ActivationCodeDb activationCodeDb;
     TokenDb tokenDb;
+    UserService userService;
     public Controller(){
         userDb = UserDb.getInstance();
         activationCodeDb = ActivationCodeDb.getInstance();
         tokenDb = TokenDb.getInstance();
+        userService = new UserService();
     }
 
     @GetMapping(path = "/userById")
@@ -43,7 +45,7 @@ public class Controller {
                 return response;
         }
 
-        return userDb.registerUser(user);
+        return userService.registerUser(user);
 
     }
 //    @PostMapping(path = "/postActivationCode", consumes = "application/json")
@@ -54,7 +56,7 @@ public class Controller {
 
     @GetMapping(path = "/users")
     public List<UserModel> getUsers(){
-        return userDb.getUsers();
+        return userService.getUsers();
     }
 
     @GetMapping(path = "/activationCode")
@@ -78,23 +80,23 @@ public class Controller {
 
     @PostMapping(path = "/update")
     public UserModel updateUser(@RequestBody UserModel newUser){
-        return userDb.updateUser(newUser);
+        return userService.updateUser(newUser);
     }
 
     @PostMapping(path = "/login")
     public String login(@RequestParam String username, @RequestParam String password){
-        return userDb.login(username, password);
+        return userService.login(username, password);
     }
 
     @DeleteMapping(path = "/logout")
     public void logout(@RequestParam int id, @RequestParam String token){
-        userDb.logout(id, token);
+        userService.logout(id, token);
     }
 
     @GetMapping(path = "/myInfo")
     public UserModel getMyInfo(Integer id, String token){
         if (id==null || token==null) return null;
-        return userDb.getMyInfo(id, token);
+        return userService.getMyInfo(id, token);
     }
 
     @GetMapping(path = "/getTokens")
