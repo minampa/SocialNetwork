@@ -44,8 +44,22 @@ public class UserDb {
     public void putPhoneNumbers(String phoneNumber, UserModel user){
         usersByPhoneNumbers.put(phoneNumber, user);
     }
-    public void updateUser(UserModel newUser){
-
+    public UserModel updateUser(UserModel newUser){
+        UserModel oldUser = findUserById(newUser.id);
+        if (oldUser == null) return null;
+        if (!oldUser.phoneNumber.equals(newUser.phoneNumber) ){
+            if (findUserByPhoneNumber(newUser.phoneNumber) != null) return null;
+            oldUser.phoneNumber = newUser.phoneNumber;
+            newUser.isActive = false;
+            putPhoneNumbers(newUser.phoneNumber, newUser);
+        }
+        if (!oldUser.username.equals(newUser.username)){
+            if (findUserByUsername(newUser.username) != null) return null;
+            oldUser.username = newUser.username;
+        }
+        oldUser.firstName = newUser.firstName;
+        oldUser.lastName = newUser.lastName;
+        return newUser;
     }
     public List<UserModel> getUsersById(){
         return usersById.values().stream().toList();

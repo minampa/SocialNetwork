@@ -15,6 +15,8 @@ public class UserService{
     public TokenDb tokenDb;
     public UserService(){
         userDb = UserDb.getInstance();
+        activationCodeDb = ActivationCodeDb.getInstance();
+        tokenDb = TokenDb.getInstance();
     }
     public ActivationCodeDb activationCodeDb;
     public UserModel findUserById(int id){
@@ -89,33 +91,20 @@ public class UserService{
     }
 
     public UserModel updateUser(UserModel newUser){
-        UserModel oldUser = findUserById(newUser.id);
-        if (oldUser == null) return null;
-        if (!oldUser.phoneNumber.equals(newUser.phoneNumber) ){
-            if (userDb.findUserByPhoneNumber(newUser.phoneNumber) != null) return null;
-//            if (phoneNumbers.get(newUser.phoneNumber)!= null) return null;
-            oldUser.phoneNumber = newUser.phoneNumber;
-            newUser.isActive = false;
+        UserModel oldUser = userDb.findUserById(newUser.id);
+        UserModel updatedUser = userDb.updateUser(newUser);
+        if (!updatedUser.phoneNumber.equals(oldUser.phoneNumber)){
             String activationCode = generateActivationCode();
             activationCodeDb.activationCode.remove(newUser.id, activationCode);
             activationCodeDb.activationCode.put(newUser.id, activationCode);
             sendCodeToUser(newUser.id, activationCode);
-            userDb.putPhoneNumbers(newUser.phoneNumber, newUser);
-//            phoneNumbers.put(newUser.phoneNumber, newUser);
         }
-        if (!oldUser.username.equals(newUser.username)){
-            if (userDb.findUserByUsername(newUser.username) != null) return null;
-//            if (usernames.get(newUser.username) != null) return null;
-            oldUser.username = newUser.username;
-        }
-        oldUser.firstName = newUser.firstName;
-        oldUser.lastName = newUser.lastName;
-        return newUser;
+        return updatedUser;
     }
 
     public String login(String username, String password){
         UserModel user = findUserByUsername(username);
-        if (user != null && password.equals(user.password)){
+        if (user != null && user.isActive && password.equals(user.password)){
             String token = createToken();
             tokenDb.tokens.put(user.id, token);
             return token;
