@@ -4,7 +4,7 @@ import java.util.TreeMap;
 
 public class ActivationCodeDb {
 
-    public TreeMap<Integer, String> activationCode = new TreeMap<>();
+    public TreeMap<Integer, String> activationCodes = new TreeMap<>();
     private ActivationCodeDb(){
 
     }
@@ -15,6 +15,12 @@ public class ActivationCodeDb {
             activationCodeDb = new ActivationCodeDb();
         }
         return activationCodeDb;
+    }
+    public void insertActivationCode(Integer id, String activationCode){
+        activationCodes.put(id, activationCode);
+    }
+    public void deleteActivationCode(Integer id){
+        activationCodes.remove(id);
     }
 
 }

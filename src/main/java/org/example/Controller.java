@@ -1,7 +1,6 @@
 package org.example;
 
 
-import org.apache.el.parser.Token;
 import org.example.database.ActivationCodeDb;
 import org.example.database.TokenDb;
 import org.example.database.UserDb;
@@ -61,17 +60,17 @@ public class Controller {
 
     @GetMapping(path = "/activationCode")
     public TreeMap<Integer,String> getActivationCodes(){
-        return activationCodeDb.activationCode;
+        return activationCodeDb.activationCodes;
     }
 
     @PostMapping(path = "/activate")
     public String activate(@RequestParam int id,@RequestParam String activationCode){
         UserModel user = userDb.findUserById(id);
         if (user == null) return "user not found";
-        String activationCodeInServer = activationCodeDb.activationCode.get(id);
+        String activationCodeInServer = activationCodeDb.activationCodes.get(id);
         if (activationCode.equals(activationCodeInServer)) {
             user.isActive = true;
-            activationCodeDb.activationCode.remove(id);
+            activationCodeDb.activationCodes.remove(id);
             return "activated successfully.";
         }else return "your code is wrong.";
         //we should save the user but user is in memory ram, we don't need to save it.

@@ -16,4 +16,11 @@ public class TokenDb {
         }
         return tokenDb;
     }
+
+    public void insertToken(Integer id, String token){
+        tokens.put(id, token);
+    }
+    public void deleteToken(Integer id){
+        tokens.remove(id);
+    }
 }

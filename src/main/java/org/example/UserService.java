@@ -43,7 +43,8 @@ public class UserService{
         String activationCode = generateActivationCode();
         user.isActive = false;
         user.id = counter;
-        activationCodeDb.activationCode.put(user.id, activationCode);
+        activationCodeDb.insertActivationCode(user.id, activationCode);
+//        activationCodeDb.activationCodes.put(user.id, activationCode);
         sendCodeToUser(user.id,activationCode);
         //todo check, username,
         userDb.insertUsers(user);
@@ -95,8 +96,8 @@ public class UserService{
         UserModel updatedUser = userDb.updateUser(newUser);
         if (!updatedUser.phoneNumber.equals(oldUser.phoneNumber)){
             String activationCode = generateActivationCode();
-            activationCodeDb.activationCode.remove(newUser.id, activationCode);
-            activationCodeDb.activationCode.put(newUser.id, activationCode);
+            activationCodeDb.activationCodes.remove(newUser.id, activationCode);
+            activationCodeDb.activationCodes.put(newUser.id, activationCode);
             sendCodeToUser(newUser.id, activationCode);
         }
         return updatedUser;
@@ -106,7 +107,7 @@ public class UserService{
         UserModel user = findUserByUsername(username);
         if (user != null && user.isActive && password.equals(user.password)){
             String token = createToken();
-            tokenDb.tokens.put(user.id, token);
+            tokenDb.insertToken(user.id, token);
             return token;
         }
         return "";
@@ -114,7 +115,7 @@ public class UserService{
     public void logout(int id, String token){
         String t = tokenDb.tokens.get(id);
         if( t.equals(token))
-            tokenDb.tokens.remove(id);
+            tokenDb.deleteToken(id);
     }
 
     public UserModel getMyInfo(int id, String token) {
