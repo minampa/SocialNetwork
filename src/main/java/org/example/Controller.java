@@ -93,9 +93,8 @@ public class Controller {
     }
 
     @GetMapping(path = "/myInfo")
-    public UserModel getMyInfo(Integer id, String token){
-        if (id==null || token==null) return null;
-        return userService.getMyInfo(id, token);
+    public UserModel getMyInfo(){
+        return userService.getMyInfo();
     }
 
     @GetMapping(path = "/getTokens")
