@@ -1,19 +1,23 @@
 package org.example.model;
 
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+
 import javax.persistence.Entity;
 import javax.persistence.Id;
 @Entity
+@NoArgsConstructor
+@Builder
+@AllArgsConstructor
+@Data
 public class TokenModel {
-    public String token;
+    private String token;
     @Id
-    public int userId;
+    private int userId;
 
-    public TokenModel(){
 
-    }
-    public TokenModel(String token, Integer userId){
-        this.token = token;
-        this.userId = userId;
-    }
+
 
 }

@@ -1,39 +1,36 @@
 package org.example.model;
 
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.Id;
 
 @Entity(name = "UserModel")
-public class UserModel extends ResponseModel {
+@NoArgsConstructor
+@Builder
+@AllArgsConstructor
+@Data
+public class UserModel {
     @Id
-    public int id;
+    private int id;
 
-    public String firstName;
+    private String firstName;
 
-    public String lastName;
+    private String lastName;
     @Column(unique = true)
 
-    public String username;
-    public String password;
+    private String username;
+    private String password;
     @Column(unique = true)
 
-    public String phoneNumber;
+    private String phoneNumber;
 
-    public boolean isActive;
-    public UserModel(){
-
-    }
-
-    public UserModel(int id, String firstName, String lastName, String username,
-                     String password ,String phoneNumber, boolean isActive) {
-        this.id = id;
-        this.firstName = firstName;
-        this.lastName = lastName;
-        this.username = username;
-        this.password = password;
-        this.phoneNumber = phoneNumber;
-        this.isActive = isActive;
-    }
+    private boolean isActive;
+   
+    
 
 }

@@ -9,6 +9,8 @@ import org.example.repository.TokenRepository;
 import org.example.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+import org.springframework.stereotype.Service;
+
 import javax.transaction.Transactional;
 import java.util.List;
 import java.util.Random;
@@ -35,20 +37,20 @@ public class UserService{
         return userRepository.findAll();
     }
     public UserModel registerUser(UserModel user){
-        if (userRepository.findUserModelByUsername(user.username) != null)
+        if (userRepository.findUserModelByUsername(user.getUsername()) != null)
             return null;
-        if (userRepository.findUserModelByPhoneNumber(user.phoneNumber) != null)
+        if (userRepository.findUserModelByPhoneNumber(user.getPhoneNumber()) != null)
             return null;
 //        if (usernames.get(user.username)!=null)
 //            return null;
 //        if (phoneNumbers.get(user.phoneNumber)!=null)
 //            return null;
         String activationCode = generateActivationCode();
-        user.isActive = false;
-        user.id = counter;
-        activationCodeRepository.save(new ActivationModel(user.id,activationCode));
+        user.setActive(false);
+        user.setId(counter);
+        activationCodeRepository.save(new ActivationModel(user.getId(),activationCode));
 //        activationCodeDb.activationCodes.put(user.id, activationCode);
-        sendCodeToUser(user.id,activationCode);
+        sendCodeToUser(user.getId(),activationCode);
         //todo check, username,
         userRepository.save(user);
 //        users.put(counter,user);
@@ -95,22 +97,22 @@ public class UserService{
     }
 
     public UserModel updateUser(UserModel newUser){
-        UserModel oldUser = userRepository.findUserModelById(newUser.id);
+        UserModel oldUser = userRepository.findUserModelById(newUser.getId());
         UserModel updatedUser = userRepository.save(newUser);
-        if (!updatedUser.phoneNumber.equals(oldUser.phoneNumber)){
+        if (!updatedUser.getUsername().equals(oldUser.getPhoneNumber())){
             String activationCode = generateActivationCode();
-            activationCodeRepository.deleteByUserId(newUser.id);
-            activationCodeRepository.save(new ActivationModel(newUser.id, activationCode));
-            sendCodeToUser(newUser.id, activationCode);
+            activationCodeRepository.deleteByUserId(newUser.getId());
+            activationCodeRepository.save(new ActivationModel(newUser.getId(), activationCode));
+            sendCodeToUser(newUser.getId(), activationCode);
         }
         return updatedUser;
     }
 
     public String login(String username, String password){
         UserModel user = findUserByUsername(username);
-        if (user != null && user.isActive && password.equals(user.password)){
+        if (user != null && user.isActive() && password.equals(user.getPassword())){
             String token = createToken();
-            tokenRepository.save(new TokenModel(token, user.id));
+            tokenRepository.save(new TokenModel(token, user.getId()));
             return token;
         }
         return "";
@@ -118,16 +120,31 @@ public class UserService{
     @Transactional
     public void logout(int id, String token){
         TokenModel t = tokenRepository.findByUserId(id);
-        if( t.token.equals(token))
+        if( t.getToken().equals(token))
             tokenRepository.deleteByUserId(id);
     }
 
     public UserModel getMyInfo(int id, String token) {
         TokenModel t = tokenRepository.findByUserId(id);
-        if (t!=null && t.token.equals(token))
+        if (t!=null && t.getToken().equals(token))
             return userRepository.findUserModelById(id);
         return null;
     }
 
 
+    public List<ActivationModel> findAllActivationCodes() {
+        return activationCodeRepository.findAll();
+    }
+
+    public List<TokenModel> findAllTokens() {
+        return tokenRepository.findAll();
+    }
+
+    public void deleteActivationCodeByUserId(int id) {
+        activationCodeRepository.deleteByUserId(id);
+    }
+
+    public ActivationModel findActivationCodeByUserId(int id) {
+        return activationCodeRepository.findActivationCodeByUserId(id);
+    }
 }

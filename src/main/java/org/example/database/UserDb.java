@@ -38,29 +38,29 @@ public class UserDb {
         return usersByPhoneNumbers.get(phoneNumber);
     }
     public void insertUsers(UserModel user) {
-        usersById.put(user.id, user);
-        usersByUsername.put(user.username, user);
-        usersByPhoneNumbers.put(user.phoneNumber, user);
+        usersById.put(user.getId(), user);
+        usersByUsername.put(user.getUsername(), user);
+        usersByPhoneNumbers.put(user.getPhoneNumber(), user);
     }
 
     public void putPhoneNumbers(String phoneNumber, UserModel user){
         usersByPhoneNumbers.put(phoneNumber, user);
     }
     public UserModel updateUser(UserModel newUser){
-        UserModel oldUser = findUserById(newUser.id);
+        UserModel oldUser = findUserById(newUser.getId());
         if (oldUser == null) return null;
-        if (!oldUser.phoneNumber.equals(newUser.phoneNumber) ){
-            if (findUserByPhoneNumber(newUser.phoneNumber) != null) return null;
-            oldUser.phoneNumber = newUser.phoneNumber;
-            newUser.isActive = false;
-            putPhoneNumbers(newUser.phoneNumber, newUser);
+        if (!oldUser.getPhoneNumber().equals(newUser.getPhoneNumber()) ){
+            if (findUserByPhoneNumber(newUser.getPhoneNumber()) != null) return null;
+            oldUser.setPhoneNumber(newUser.getPhoneNumber());
+            newUser.setActive(false);
+            putPhoneNumbers(newUser.getPhoneNumber(), newUser);
         }
-        if (!oldUser.username.equals(newUser.username)){
-            if (findUserByUsername(newUser.username) != null) return null;
-            oldUser.username = newUser.username;
+        if (!oldUser.getUsername().equals(newUser.getUsername())){
+            if (findUserByUsername(newUser.getUsername()) != null) return null;
+            oldUser.setUsername(newUser.getUsername());
         }
-        oldUser.firstName = newUser.firstName;
-        oldUser.lastName = newUser.lastName;
+        oldUser.setFirstName(newUser.getFirstName());
+        oldUser.setLastName(newUser.getLastName());
         return newUser;
     }
     public List<UserModel> getUsersById(){

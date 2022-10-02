@@ -1,17 +1,15 @@
 package org.example.model;
 
+import lombok.*;
 import javax.persistence.Entity;
 import javax.persistence.Id;
 @Entity
+@NoArgsConstructor
+@AllArgsConstructor
+@Data
+@Builder
 public class ActivationModel {
     @Id
-    public int userId;
-    public String activationCode;
-    public ActivationModel(){
-
-    }
-    public ActivationModel(int id,String activationCode){
-        this.userId = id;
-        this.activationCode = activationCode;
-    }
+    private int userId;
+    private String activationCode;
 }

@@ -1,24 +1,26 @@
 package org.example.model;
 
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+
 import javax.persistence.Entity;
 import javax.persistence.Id;
 import java.util.Date;
 
 @Entity
+@NoArgsConstructor
+@Builder
+@AllArgsConstructor
+@Data
 public class PostModel {
     @Id
-    public int id;
-    public String description;
-    public Date creationDate;
-
-    public PostModel(){
-
-    }
+    private int id;
+    private String description;
+    private Date creationDate;
 
 
-    public PostModel(int id, String description, Date creationDate) {
-        this.id = id;
-        this.description = description;
-        this.creationDate = creationDate;
-    }
+
+
 }

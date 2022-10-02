@@ -1,6 +1,7 @@
 package org.example;
 
 
+import com.sun.net.httpserver.Headers;
 import org.example.database.ActivationCodeDb;
 import org.example.database.TokenDb;
 import org.example.database.UserDb;
@@ -10,10 +11,10 @@ import org.example.model.UserModel;
 import org.example.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.servlet.function.ServerRequest;
 
 import javax.transaction.Transactional;
 import java.util.List;
-import java.util.TreeMap;
 
 
 @RestController
@@ -21,7 +22,7 @@ public class Controller {
 
 
     @Autowired
-    UserService userService;
+    public UserService userService;
 
     @GetMapping(path = "/userById")
     public UserModel findUserByID(@RequestParam int id) {
@@ -36,10 +37,9 @@ public class Controller {
 
     @RequestMapping(method = RequestMethod.POST, path = "/register", consumes = "application/json")
     public UserModel registerUser(@RequestBody UserModel user){
-        if (user.username == null || user.username.equals("") ||
-            user.phoneNumber==null || user.phoneNumber.equals("")) {
+        if (user.getUsername() == null || user.getUsername().equals("") ||
+            user.getPhoneNumber()==null || user.getPhoneNumber().equals("")) {
                 UserModel response = new UserModel();
-                response.message = "invalid input";
                 return response;
         }
 
@@ -59,7 +59,7 @@ public class Controller {
 
     @GetMapping(path = "/activationCode")
     public List<ActivationModel> getActivationCodes(){
-        return userService.activationCodeRepository.findAll();
+        return userService.findAllActivationCodes();
     }
 
     @Transactional
@@ -67,10 +67,10 @@ public class Controller {
     public String activate(@RequestParam int id,@RequestParam String activationCode){
         UserModel user = userService.findUserById(id);
         if (user == null) return "user not found";
-        ActivationModel activationCodeInServer = userService.activationCodeRepository.findActivationCodeByUserId(id);
-        if (activationCode.equals(activationCodeInServer.activationCode)) {
-            user.isActive = true;
-            userService.activationCodeRepository.deleteByUserId(id);
+        ActivationModel activationCodeInServer = userService.findActivationCodeByUserId(id);
+        if (activationCode.equals(activationCodeInServer.getActivationCode())) {
+            user.setActive(true);
+            userService.deleteActivationCodeByUserId(id);
             return "activated successfully.";
         }else return "your code is wrong.";
         //we should save the user but user is in memory ram, we don't need to save it.
@@ -100,7 +100,7 @@ public class Controller {
 
     @GetMapping(path = "/getTokens")
     public List<TokenModel> getTokens(){
-        return userService.tokenRepository.findAll();
+        return userService.findAllTokens();
     }
 }
 
