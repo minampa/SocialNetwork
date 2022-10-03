@@ -17,7 +17,6 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 
 
 @Configuration
-@EnableWebSecurity
 public class SecurityConfiguration  {
     final UserDetailsServiceImp userDetailsService;
 
@@ -49,7 +48,7 @@ public class SecurityConfiguration  {
                 .csrf().disable()
                 .addFilterBefore(authTokenFilter, UsernamePasswordAuthenticationFilter.class)
                 .exceptionHandling().authenticationEntryPoint(unauthorizedHandler).and()
-                .authorizeRequests().antMatchers("/login","/register","/activate").permitAll()
+                .authorizeRequests().antMatchers("/login","/register","/activate", "/resendCode").permitAll()
                 .anyRequest().authenticated().and().build();
     }
 

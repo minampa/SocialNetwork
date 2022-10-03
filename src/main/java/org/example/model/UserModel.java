@@ -5,9 +5,7 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.Id;
+import javax.persistence.*;
 
 @Entity(name = "UserModel")
 @NoArgsConstructor
@@ -16,6 +14,7 @@ import javax.persistence.Id;
 @Data
 public class UserModel {
     @Id
+    @GeneratedValue(strategy = GenerationType.AUTO)
     private int id;
 
     private String firstName;
@@ -30,7 +29,5 @@ public class UserModel {
     private String phoneNumber;
 
     private boolean isActive;
-   
-    
 
 }

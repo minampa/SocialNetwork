@@ -21,15 +21,16 @@ import javax.transaction.Transactional;
 import java.util.List;
 import java.util.Random;
 
-@Component
+@Service
 public class UserService{
-    int counter = 2;
     @Autowired
     public UserRepository userRepository ;
     @Autowired
     public TokenRepository tokenRepository;
     @Autowired
     public ActivationCodeRepository activationCodeRepository;
+    @Autowired
+    AuthenticationManager authenticationManager;
     public UserModel findUserById(int id){
         return userRepository.findUserModelById(id);
     }
@@ -50,82 +51,55 @@ public class UserService{
             return null;
         if (userRepository.findUserModelByPhoneNumber(user.getPhoneNumber()) != null)
             return null;
-//        if (usernames.get(user.username)!=null)
-//            return null;
-//        if (phoneNumbers.get(user.phoneNumber)!=null)
-//            return null;
-        String activationCode = generateActivationCode();
         user.setActive(false);
-        user.setId(counter);
-        activationCodeRepository.save(new ActivationModel(user.getId(),activationCode));
-//        activationCodeDb.activationCodes.put(user.id, activationCode);
-        sendCodeToUser(user.getId(),activationCode);
-        //todo check, username,
-        userRepository.save(user);
-//        users.put(counter,user);
-//        usernames.put(user.username, user);
-//        phoneNumbers.put(user.phoneNumber, user);
-        counter++;
+        UserModel savedUser = userRepository.save(user);
+        sendCodeToUser(savedUser.getId());
         return user;
     }
 
-    private void sendCodeToUser(int id,String activationCode) {
+//    private void sendCodeToUser(int id,String activationCode) {
+//        System.out.println("id: "+id + "   ===>  activation code: "+activationCode);
+//    }
+
+    public void sendCodeToUser(int id) {
+        activationCodeRepository.deleteByUserId(id);
+        String activationCode = generateActivationCode();
+        activationCodeRepository
+                .save(ActivationModel.builder().userId(id).activationCode(activationCode).build());
         System.out.println("id: "+id + "   ===>  activation code: "+activationCode);
     }
 
     public String generateActivationCode(){
-        String activationCode = "";
+        StringBuilder activationCode = new StringBuilder();
         for(int i=0; i<6; i++){
             Random random = new Random();
             String r = String.valueOf(random.nextInt(0,9));
-            activationCode += r;
+            activationCode.append(r);
         }
-        return activationCode;
+        return activationCode.toString();
     }
 
 
-//    public String createToken(){
-//        Random random = new Random();
-//        StringBuilder token = new StringBuilder();
-//        for (int i=0;i<10;i++){
-//            int r = random.nextInt(0,62);
-//            if (0<=r && r <=25){
-//                char s = (char) ((int)'a' + r);
-//                token.append(s);
-//            }
-//            if(26<=r && r<=51){
-//                char s = (char) ((int) 'A' + r - 26);
-//                token.append(s);
-//            }
-//            if(r>=52){
-//                char s = (char) ((int) '0' + r - 52);
-//                token.append(s);
-//            }
-//        }
-//        return token.toString();
-//    }
-
     public UserModel updateUser(UserModel newUser){
+        String username = SecurityContextHolder.getContext().getAuthentication().getName();
         newUser.setPassword(passwordEncoder.encode(newUser.getPassword()));
         UserModel oldUser = userRepository.findUserModelById(newUser.getId());
         UserModel updatedUser = userRepository.save(newUser);
         if (!updatedUser.getUsername().equals(oldUser.getPhoneNumber())){
-            String activationCode = generateActivationCode();
-            activationCodeRepository.deleteByUserId(newUser.getId());
-            activationCodeRepository.save(new ActivationModel(newUser.getId(), activationCode));
-            sendCodeToUser(newUser.getId(), activationCode);
+            sendCodeToUser(newUser.getId());
         }
         return updatedUser;
     }
 
     @Autowired
     JwtUtils jwtUtils;
-    @Autowired
-    AuthenticationManager authenticationManager;
-    public String login(String username, String password){
-        Authentication authentication = authenticationManager.authenticate(
-                new UsernamePasswordAuthenticationToken(username, password));
-        return jwtUtils.generateJwtToken(authentication);
+
+    public String login(String username, String password) throws Exception{
+//        authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(username, password));
+        UserModel user = userRepository.findUserModelByUsername(username);
+        if (user!=null && passwordEncoder.matches(password,user.getPassword()))
+            return jwtUtils.generateJwtToken(username);
+        else throw new Exception("unauthorized");
     }
     @Transactional
     public void logout(int id, String token){

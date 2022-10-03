@@ -1,18 +1,12 @@
 package org.example;
 
 
-import com.sun.net.httpserver.Headers;
-import org.example.database.ActivationCodeDb;
-import org.example.database.TokenDb;
-import org.example.database.UserDb;
+
 import org.example.model.ActivationModel;
 import org.example.model.TokenModel;
 import org.example.model.UserModel;
-import org.example.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.servlet.function.ServerRequest;
-
 import javax.transaction.Transactional;
 import java.util.List;
 
@@ -46,11 +40,10 @@ public class Controller {
         return userService.registerUser(user);
 
     }
-//    @PostMapping(path = "/postActivationCode", consumes = "application/json")
-//    public  UserModel postActivationCode(@RequestBody UserModel user){
-//        userData.
-//        String activationCode = ;
-//    }
+    @PutMapping(path = "/resendCode")
+    public void resend(int id){
+        userService.sendCodeToUser(id);
+    }
 
     @GetMapping(path = "/users")
     public List<UserModel> getUsers(){
@@ -83,7 +76,7 @@ public class Controller {
     }
 
     @PostMapping(path = "/login")
-    public String login(@RequestParam String username, @RequestParam String password){
+    public String login(@RequestParam String username, @RequestParam String password) throws Exception {
         return userService.login(username, password);
     }
 

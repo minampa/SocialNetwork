@@ -9,7 +9,6 @@ import java.util.List;
 @Repository
 public interface ActivationCodeRepository extends JpaRepository<ActivationModel, Integer> {
     ActivationModel findActivationCodeByUserId(int id);
-    ActivationModel save(ActivationModel activationModel);
     void deleteByUserId(int id);
     List<ActivationModel> findAll();
 
